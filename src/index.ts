@@ -3,6 +3,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import fs from "fs/promises";
 import path from "path";
+import { start } from "repl";
 
 const server = new McpServer({
   name: "file-reader",
@@ -62,7 +63,7 @@ server.tool(
         const entries = await fs.readdir(dir, { withFileTypes: true });
         const lines: string[] = [];
 
-        for (const entry of entries) {
+        for(const entry of entries) {
           const indent = "  ".repeat(depth);
           const icon = entry.isDirectory() ? "📁" : "📄";
           lines.push(`${indent}${icon} ${entry.name}`);
@@ -124,6 +125,32 @@ server.tool(
       };
     }
   }
+);
+
+server.tool(
+  "read_file_range",
+  "leggi un file partendo dalla linea x alla linea y",
+  {
+    start_line : z.number().describe("linea di partenza per lettura del file"),
+    end_line : z.number().describe("linea di termine per lettura del file ")
+  },
+  async ({start_line, end_line}) => {
+    try {
+        
+
+        return {
+          content: [{ type: "text", text: JSON.stringify(null, null, 2) }],
+        };
+    } catch (err:any){
+      return {
+        content : [{type:"text",text:`Errore: ${err.message}`}],
+        isError : true
+      };
+    }
+
+  }
+
+
 );
 
 // Avvio
