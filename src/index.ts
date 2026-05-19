@@ -131,15 +131,25 @@ server.tool(
   "read_file_range",
   "leggi un file partendo dalla linea x alla linea y",
   {
+    file_path: z.string().describe("Percorso assoluto o relativo del file"),
     start_line : z.number().describe("linea di partenza per lettura del file"),
     end_line : z.number().describe("linea di termine per lettura del file ")
   },
-  async ({start_line, end_line}) => {
+  async ({file_path,start_line, end_line}) => {
     try {
-        
-
+        const content = await fs.readFile(file_path, 'utf-8');
+        const lines = content.split(/\r?\n/);
+        let ret = "";
+        var LineNum=1;
+        for (const line of lines) {
+          if(LineNum >= start_line && LineNum <=end_line){
+            ret += LineNum + "- " + line + "\n";
+          }
+          LineNum++
+        }
+        console.log(ret)
         return {
-          content: [{ type: "text", text: JSON.stringify(null, null, 2) }],
+          content: [{ type: "text", text: ret}],
         };
     } catch (err:any){
       return {
