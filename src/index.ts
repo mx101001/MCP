@@ -41,7 +41,7 @@ server.tool(
         isError: true,
       };
     }
-  }
+  },
 );
 
 // Tool: lista file in una directory
@@ -63,7 +63,7 @@ server.tool(
         const entries = await fs.readdir(dir, { withFileTypes: true });
         const lines: string[] = [];
 
-        for(const entry of entries) {
+        for (const entry of entries) {
           const indent = "  ".repeat(depth);
           const icon = entry.isDirectory() ? "📁" : "📄";
           lines.push(`${indent}${icon} ${entry.name}`);
@@ -91,7 +91,7 @@ server.tool(
         isError: true,
       };
     }
-  }
+  },
 );
 
 // Tool: info su un file
@@ -124,7 +124,7 @@ server.tool(
         isError: true,
       };
     }
-  }
+  },
 );
 
 server.tool(
@@ -132,35 +132,40 @@ server.tool(
   "leggi un file partendo dalla linea x alla linea y",
   {
     file_path: z.string().describe("Percorso assoluto o relativo del file"),
-    start_line : z.number().describe("linea di partenza per lettura del file"),
-    end_line : z.number().describe("linea di termine per lettura del file ")
+    start_line: z.number().describe("linea di partenza per lettura del file"),
+    end_line: z.number().describe("linea di termine per lettura del file "),
   },
-  async ({file_path,start_line, end_line}) => {
+  async ({ file_path, start_line, end_line }) => {
     try {
-        const content = await fs.readFile(file_path, 'utf-8');
-        const lines = content.split(/\r?\n/);
-        let ret = "";
-        var LineNum=1;
+      const content = await fs.readFile(file_path, "utf-8");
+      const lines = content.split(/\r?\n/);
+      let ret = "";
+      var LineNum = 1;
+      if (end_line === 0) {
         for (const line of lines) {
-          if(LineNum >= start_line && LineNum <=end_line){
+          if (LineNum >= start_line) {
             ret += LineNum + "- " + line + "\n";
           }
-          LineNum++
+          LineNum++;
         }
-        console.log(ret)
-        return {
-          content: [{ type: "text", text: ret}],
-        };
-    } catch (err:any){
+      } else {
+        for (const line of lines) {
+          if (LineNum >= start_line && LineNum <= end_line) {
+            ret += LineNum + "- " + line + "\n";
+          }
+          LineNum++;
+        }
+      }
       return {
-        content : [{type:"text",text:`Errore: ${err.message}`}],
-        isError : true
+        content: [{ type: "text", text: ret }],
+      };
+    } catch (err: any) {
+      return {
+        content: [{ type: "text", text: `Errore: ${err.message}` }],
+        isError: true,
       };
     }
-
-  }
-
-
+  },
 );
 
 // Avvio
